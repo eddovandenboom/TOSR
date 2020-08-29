@@ -3,11 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace Solver
 {
-    [StructLayout(LayoutKind.Sequential)]
     public struct BoardsPBN
     {
-        public const int MAXNOOFBOARDS = 2;
-
+        public const int MAXNOOFBOARDS = 200;
         public int noOfBoards;
 
         [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.Struct, SizeConst = MAXNOOFBOARDS)]

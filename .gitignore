@@ -13,3 +13,5 @@
 /TosrIntegration.Test/obj
 /Solver/bin
 /Solver/obj
+/Test/bin/Debug/netcoreapp3.1
+/Test/obj

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Solver
 {
-    class Api
+    public class Api
     {
         private static void SolveBoardsST(string hand)
         {
@@ -64,13 +64,19 @@ namespace Solver
         public static IEnumerable<int> SolveAllBoards(IEnumerable<string> hands)
         {
             var nrOfHands = hands.Count();
+            var dealsPBN = new DealPbn[BoardsPBN.MAXNOOFBOARDS];
+            for (var i = 0; i < nrOfHands; i++)
+            {
+                dealsPBN[i] = CreateDeal(hands.ElementAt(i));
+            }
+
             var boardsBPN = new BoardsPBN
             {
                 noOfBoards = 2,
-                dealsPBN = hands.Select(CreateDeal).ToArray(),
-                targets = Enumerable.Repeat(-1, nrOfHands).ToArray(),
-                solutions = Enumerable.Repeat(1, nrOfHands).ToArray(),
-                modes = Enumerable.Repeat(0, nrOfHands).ToArray()
+                dealsPBN = dealsPBN,
+                targets = Enumerable.Repeat(-1, BoardsPBN.MAXNOOFBOARDS).ToArray(),
+                solutions = Enumerable.Repeat(1, BoardsPBN.MAXNOOFBOARDS).ToArray(),
+                modes = Enumerable.Repeat(0, BoardsPBN.MAXNOOFBOARDS).ToArray()
             };
 
             var solvedBoards = new SolvedBoards
@@ -78,19 +84,17 @@ namespace Solver
                 noOfBoards = nrOfHands
             };
 
-            FutureTricks futureTricks1 = new FutureTricks();
-            FutureTricks futureTricks2 = new FutureTricks();
-            var ddsResults = new[] { futureTricks1, futureTricks2 };
+            var ddsResults = new FutureTricks[BoardsPBN.MAXNOOFBOARDS];
             solvedBoards.solvedBoards = ddsResults;
 
-            IntPtr boardsBPNPtr = Marshal.AllocHGlobal(Marshal.SizeOf(boardsBPN));
-            Marshal.StructureToPtr(boardsBPN, boardsBPNPtr, false);
+            //IntPtr boardsBPNPtr = Marshal.AllocHGlobal(Marshal.SizeOf(boardsBPN));
+            //Marshal.StructureToPtr(boardsBPN, boardsBPNPtr, false);
 
-            int cb = Marshal.SizeOf(solvedBoards);
-            IntPtr solvedBoardsPtr = Marshal.AllocHGlobal(cb);
+            //int cb = Marshal.SizeOf(solvedBoards);
+            //IntPtr solvedBoardsPtr = Marshal.AllocHGlobal(cb);
 
-            var res = Pinvoke.SolveAllBoards(boardsBPNPtr, solvedBoardsPtr);
-            solvedBoards = Marshal.PtrToStructure<SolvedBoards>(solvedBoardsPtr);
+            var res = Pinvoke.SolveAllBoards(ref boardsBPN, out solvedBoards);
+            //solvedBoards = Marshal.PtrToStructure<SolvedBoards>(solvedBoardsPtr);
 
             if (res != 1)
             {
